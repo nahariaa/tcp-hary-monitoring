@@ -2,35 +2,41 @@ name: TCP Haryana Monitor
 
 on:
   schedule:
-    - cron: '0 * * * *' # Runs every hour at minute 0
-  workflow_dispatch: # Allows you to click "Run Now" manually for testing
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
   monitor:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout Repository
+    - name: Checkout Code
       uses: actions/checkout@v3
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '20'
+        node-version: '20' # <--- MUST BE 20
 
-    - name: Install Dependencies
+    - name: Install System Dependencies for Puppeteer
+      # This step installs the necessary Linux libraries to run Chrome Headless
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
+
+    - name: Install NPM Dependencies
       run: npm install
 
-    - name: Run Monitor Script
+    - name: Run Monitor
       env:
         EMAIL_USER: ${{ secrets.EMAIL_USER }}
         EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
         EMAIL_TO: ${{ secrets.EMAIL_TO }}
       run: node monitor.js
 
-    - name: Save History
+    - name: Commit History
       run: |
         git config --global user.name 'TCP-Bot'
         git config --global user.email 'bot@noreply.github.com'
         git add history.json
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update project history" && git push)
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update history" && git push)
