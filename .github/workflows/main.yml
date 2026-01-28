@@ -61,6 +61,13 @@ jobs:
     - name: Install NPM Dependencies
       run: npm install
 
+    - name: Network Connectivity Test
+      run: |
+        echo "Testing connection to TCP Haryana..."
+        curl -v --connect-timeout 10 https://edraw.tcpharyana.gov.in || echo "Connection Failed as expected"
+        echo "Testing connection to Google (Control Group)..."
+        curl -v --connect-timeout 10 https://www.google.com
+
     - name: Run Monitor
       env:
         EMAIL_USER: ${{ secrets.EMAIL_USER }}
