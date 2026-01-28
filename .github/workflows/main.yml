@@ -18,10 +18,10 @@ jobs:
       with:
         node-version: '20' # <--- MUST BE 20
 
-   - name: Install System Dependencies for Puppeteer
+    - name: Install System Dependencies for Puppeteer
       run: |
-        sudo apt-get update
-        sudo apt-get install -y \
+          sudo apt-get update
+          sudo apt-get install -y \
           libasound2t64 \
           libatk1.0-0t64 \
           libc6 \
@@ -57,7 +57,7 @@ jobs:
           lsb-release \
           xdg-utils \
           wget
-          
+
     - name: Install NPM Dependencies
       run: npm install
 
