@@ -1,0 +1,36 @@
+name: TCP Haryana Monitor
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Runs every hour at minute 0
+  workflow_dispatch: # Allows you to click "Run Now" manually for testing
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Run Monitor Script
+      env:
+        EMAIL_USER: ${{ secrets.EMAIL_USER }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+        EMAIL_TO: ${{ secrets.EMAIL_TO }}
+      run: node monitor.js
+
+    - name: Save History
+      run: |
+        git config --global user.name 'TCP-Bot'
+        git config --global user.email 'bot@noreply.github.com'
+        git add history.json
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update project history" && git push)
